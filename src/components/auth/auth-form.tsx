@@ -78,11 +78,19 @@ export default function AuthForm({ defaultMode = 'login' }: { defaultMode?: Auth
         setMode('login'); // Switch to login view after successful signup
       }
     } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: mode === 'login' ? 'Login Failed' : 'Sign up Failed',
-        description: error.message || 'An unexpected error occurred.',
-      });
+      if (error.code === 'auth/api-key-not-valid') {
+          toast({
+            variant: 'destructive',
+            title: 'Configuration Error',
+            description: 'The Firebase API key is not valid. Please check your environment configuration.',
+          });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: mode === 'login' ? 'Login Failed' : 'Sign up Failed',
+          description: error.message || 'An unexpected error occurred.',
+        });
+      }
     } finally {
       setIsLoading(false);
     }

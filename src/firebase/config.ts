@@ -11,10 +11,18 @@ export function getFirebaseConfig() {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   };
 
-  // If the config is not set, return null. The app will handle this gracefully.
+  // If the config is not set, return a dummy config to avoid app crash
+  // and show a specific error on auth attempts.
   if (!firebaseConfig.apiKey) {
-    console.warn("Firebase configuration is missing. App will run in a degraded mode.");
-    return null;
+    console.warn("Firebase configuration is missing. Using placeholder credentials. Authentication will fail.");
+    return {
+      apiKey: "dummy-key",
+      authDomain: "dummy-project.firebaseapp.com",
+      projectId: "dummy-project",
+      storageBucket: "dummy-project.appspot.com",
+      messagingSenderId: "0",
+      appId: "1:0:web:dummy-app-id",
+    };
   }
 
   return firebaseConfig;
