@@ -78,10 +78,15 @@ export default function AuthForm({ defaultMode = 'login' }: { defaultMode?: Auth
         setMode('login'); // Switch to login view after successful signup
       }
     } catch (error: any) {
+      let description = error.message || 'An unexpected error occurred.';
+      // Provide a more helpful message if the API key is invalid
+      if (error.code === 'auth/invalid-api-key') {
+        description = "Authentication failed: The app is not configured with valid Firebase credentials. Please check your environment variables.";
+      }
       toast({
         variant: 'destructive',
         title: mode === 'login' ? 'Login Failed' : 'Sign up Failed',
-        description: error.message || 'An unexpected error occurred.',
+        description: description,
       });
     } finally {
       setIsLoading(false);
