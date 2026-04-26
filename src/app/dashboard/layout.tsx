@@ -9,17 +9,15 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="min-h-screen">
-        <Sidebar>
-          <DashboardSidebar />
-        </Sidebar>
-        <SidebarInset>
-          <div className="flex flex-col">
-            <DashboardHeader />
-            <main className="flex-1 p-4 md:p-6">{children}</main>
-          </div>
-        </SidebarInset>
-      </div>
+      <Sidebar>
+        <DashboardSidebar />
+      </Sidebar>
+      <SidebarInset>
+        <DashboardHeader />
+        <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+          {children}
+        </div>
+      </SidebarInset>
     </SidebarProvider>
   );
 }
