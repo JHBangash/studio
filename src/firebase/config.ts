@@ -11,19 +11,10 @@ export function getFirebaseConfig() {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   };
 
-  // If the config is not set, return a dummy config to prevent crashes.
+  // If the config is not set, throw an error.
+  // This is a critical error, as the app cannot function without Firebase config.
   if (!firebaseConfig.apiKey) {
-    console.warn(
-      'Firebase config is not set. Using dummy values for development. Please check your .env file.'
-    );
-    return {
-      apiKey: 'dummy-key',
-      authDomain: 'dummy-project.firebaseapp.com',
-      projectId: 'dummy-project',
-      storageBucket: 'dummy-project.appspot.com',
-      messagingSenderId: '1234567890',
-      appId: '1:1234567890:web:dummy-id',
-    };
+    throw new Error('Firebase config is not set. Please check your .env file or environment variables.');
   }
 
   return firebaseConfig;
