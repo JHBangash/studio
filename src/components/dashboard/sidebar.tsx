@@ -1,3 +1,5 @@
+"use client";
+
 import {
   SidebarContent,
   SidebarHeader,
@@ -16,8 +18,11 @@ import {
 } from "lucide-react";
 import Logo from "../logo";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function DashboardSidebar() {
+  const pathname = usePathname();
+
   return (
     <>
       <SidebarHeader>
@@ -34,8 +39,7 @@ export default function DashboardSidebar() {
             <SidebarMenuButton
               asChild
               tooltip="Dashboard"
-              // A real implementation would use usePathname to set isActive
-              isActive={true}
+              isActive={pathname === "/dashboard"}
             >
               <Link href="/dashboard">
                 <LayoutDashboard />
@@ -44,7 +48,11 @@ export default function DashboardSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Documents">
+            <SidebarMenuButton
+              asChild
+              tooltip="Documents"
+              isActive={pathname.startsWith("/dashboard/documents")}
+            >
               <Link href="/dashboard/documents">
                 <FileText />
                 <span>Documents</span>
