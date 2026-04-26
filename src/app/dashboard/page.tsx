@@ -9,24 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BarChart, FileText } from "lucide-react";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-
-const chartData = [
-  { type: "Invoice", count: 12 },
-  { type: "Contract", count: 8 },
-  { type: "Proposal", count: 5 },
-  { type: "HR Form", count: 7 },
-  { type: "Brief", count: 3 },
-  { type: "Report", count: 4 },
-];
-
-const chartConfig = {
-  count: {
-    label: "Documents",
-    color: "hsl(var(--primary))",
-  },
-};
+import DocumentsByTypeChart from "@/components/dashboard/documents-by-type-chart";
 
 export default function DashboardPage() {
   const recentDocuments = documents.slice(0, 5);
@@ -66,24 +49,7 @@ export default function DashboardPage() {
             <CardDescription>Distribution of documents across different categories.</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-64 w-full">
-              <BarChart accessibilityLayer data={chartData}>
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="type"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  tickFormatter={(value) => value.slice(0, 3)}
-                />
-                <YAxis />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent indicator="dot" />}
-                />
-                <Bar dataKey="count" fill="var(--color-count)" radius={4} />
-              </BarChart>
-            </ChartContainer>
+            <DocumentsByTypeChart />
           </CardContent>
         </Card>
       </div>
