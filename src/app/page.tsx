@@ -24,7 +24,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild className="w-full">
-                <Link href="/dashboard">
+                <Link href="/login">
                   Enter Portal <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -37,7 +37,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild variant="secondary" className="w-full">
-                <Link href="/portal">
+                <Link href="/login">
                   Enter Portal <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

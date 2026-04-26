@@ -28,13 +28,13 @@ export default function DashboardHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar>
-                <AvatarImage src="https://picsum.photos/seed/1/32/32" data-ai-hint="person" />
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarImage src="https://picsum.photos/seed/10/32/32" data-ai-hint="person" />
+                <AvatarFallback>AU</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>John Doe</DropdownMenuLabel>
+            <DropdownMenuLabel>Admin User</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="#">

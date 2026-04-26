@@ -60,10 +60,14 @@ export default function DashboardSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Teams">
-              <Link href="#">
+            <SidebarMenuButton
+              asChild
+              tooltip="Users"
+              isActive={pathname.startsWith("/dashboard/users")}
+            >
+              <Link href="/dashboard/users">
                 <Users />
-                <span>Teams</span>
+                <span>Users</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

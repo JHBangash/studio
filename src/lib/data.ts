@@ -24,6 +24,23 @@ export type Document = {
   metadata: Record<string, string>;
 };
 
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  password?: string;
+  role: 'Admin' | 'Employee' | 'Customer';
+  avatar: string;
+};
+
+export const appUsers: User[] = [
+  { id: 'user-001', name: 'Admin User', email: 'admin@nexus.com', password: 'password123', role: 'Admin', avatar: 'https://picsum.photos/seed/10/32/32' },
+  { id: 'user-002', name: 'Alice Johnson', email: 'alice@nexus.com', password: 'password123', role: 'Employee', avatar: 'https://picsum.photos/seed/11/32/32' },
+  { id: 'user-003', name: 'Client Portal', email: 'customer@client.com', password: 'password123', role: 'Customer', avatar: 'https://picsum.photos/seed/12/32/32' },
+  { id: 'user-004', name: 'David Green', email: 'david@nexus.com', password: 'password123', role: 'Employee', avatar: 'https://picsum.photos/seed/13/32/32' },
+];
+
+
 export const documents: Document[] = [
   {
     id: 'DOC001',
