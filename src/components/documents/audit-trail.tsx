@@ -1,13 +1,13 @@
-import { type Document } from "@/lib/data";
-import { format, parseISO } from "date-fns";
-import { ScrollArea } from "../ui/scroll-area";
-import { Separator } from "../ui/separator";
+import { format, fromUnixTime } from 'date-fns';
+import { ScrollArea } from '../ui/scroll-area';
 
 type AuditTrailProps = {
-  trail: Document["auditTrail"];
+  trail: any[] | null;
 };
 
 export default function AuditTrail({ trail }: AuditTrailProps) {
+  if (!trail) return null;
+
   return (
     <ScrollArea className="h-48">
       <div className="space-y-4 pr-4">
@@ -17,11 +17,17 @@ export default function AuditTrail({ trail }: AuditTrailProps) {
             <div className="flex-1 space-y-1">
               <div className="flex justify-between text-sm">
                 <p className="font-medium">{event.action}</p>
-                <p className="text-muted-foreground text-xs">{format(parseISO(event.date), "MMM d, h:mm a")}</p>
+                {event.date?.seconds && (
+                  <p className="text-muted-foreground text-xs">
+                    {format(fromUnixTime(event.date.seconds), 'MMM d, h:mm a')}
+                  </p>
+                )}
               </div>
               <p className="text-xs text-muted-foreground">by {event.user}</p>
               {event.comment && (
-                <p className="text-xs italic bg-muted p-2 rounded-md">"{event.comment}"</p>
+                <p className="text-xs italic bg-muted p-2 rounded-md">
+                  "{event.comment}"
+                </p>
               )}
             </div>
           </div>

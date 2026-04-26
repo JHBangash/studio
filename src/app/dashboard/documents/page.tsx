@@ -1,10 +1,17 @@
-import DocumentList from "@/components/documents/document-list";
-import { documents } from "@/lib/data";
-import { Button } from "@/components/ui/button";
-import { FilePlus2 } from "lucide-react";
-import DocumentUpload from "@/components/documents/document-upload";
+'use client';
+
+import DocumentList from '@/components/documents/document-list';
+import { Button } from '@/components/ui/button';
+import { FilePlus2, Loader2 } from 'lucide-react';
+import DocumentUpload from '@/components/documents/document-upload';
+import { useCollection } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
 
 export default function DocumentsPage() {
+  const documentsRef = collection(useFirestore(), 'documents');
+  const q = query(documentsRef, orderBy('createdAt', 'desc'));
+  const { data: documents, loading } = useCollection(q);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -22,7 +29,13 @@ export default function DocumentsPage() {
         </DocumentUpload>
       </div>
       <div className="border rounded-lg">
-        <DocumentList documents={documents} />
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <DocumentList documents={documents} />
+        )}
       </div>
     </div>
   );

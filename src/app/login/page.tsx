@@ -1,123 +1,16 @@
 'use client';
 
-import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import Logo from "@/components/logo";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
-import { appUsers } from "@/lib/data";
-import { Loader2 } from "lucide-react";
+import { Suspense } from 'react';
+import AuthForm from '@/components/auth/auth-form';
+
+function LoginPageContent() {
+  return <AuthForm />;
+}
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  const { toast } = useToast();
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    setTimeout(() => {
-      const user = appUsers.find((u) => u.email === email && u.password === password);
-
-      if (user) {
-        toast({
-          title: "Login Successful",
-          description: `Welcome back, ${user.name}!`,
-        });
-        if (user.role === "Customer") {
-          router.push("/portal");
-        } else {
-          router.push("/dashboard");
-        }
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: "Invalid email or password. Please try again.",
-        });
-        setIsLoading(false);
-      }
-    }, 1000); // Simulate network delay
-  };
-
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8 bg-background">
-      <div className="flex w-full max-w-sm flex-col items-center">
-        <Logo className="w-14 h-14 mb-4 text-primary" />
-        <h1 className="text-2xl font-bold tracking-tighter text-foreground mb-1 font-headline">
-          Sign in to FlowDocs Nexus
-        </h1>
-        <p className="text-muted-foreground mb-6">
-          Enter your credentials to access your portal.
-        </p>
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle>Login</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="m@example.com" 
-                  required 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  required 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
-                />
-              </div>
-              <Button className="w-full" type="submit" disabled={isLoading}>
-                {isLoading ? <Loader2 className="animate-spin" /> : "Sign In"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-        
-        <p className="mt-4 text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="underline hover:text-primary">
-                Sign up
-            </Link>
-        </p>
-
-        <Separator className="my-6" />
-
-        <Card className="w-full bg-muted/50 border-dashed">
-            <CardHeader>
-                <CardTitle className="text-base">Demo Credentials</CardTitle>
-                <CardDescription className="text-xs">Use these mock accounts to explore the different portals. The app will redirect you to the correct portal upon login.</CardDescription>
-            </CardHeader>
-            <CardContent className="text-sm space-y-2">
-                <p><b>Admin/Employee:</b><br />Email: <code className="bg-card p-1 rounded-sm">admin@nexus.com</code><br />Password: <code className="bg-card p-1 rounded-sm">password123</code></p>
-                 <p><b>Customer:</b><br />Email: <code className="bg-card p-1 rounded-sm">customer@client.com</code><br />Password: <code className="bg-card p-1 rounded-sm">password123</code></p>
-            </CardContent>
-        </Card>
-        
-        <p className="mt-8 text-xs text-muted-foreground">
-          <Link href="/" className="underline hover:text-primary">Back to home</Link>
-        </p>
-      </div>
-    </main>
+    <Suspense>
+      <LoginPageContent />
+    </Suspense>
   );
 }

@@ -1,20 +1,30 @@
-import DocumentList from "@/components/documents/document-list";
-import { documents } from "@/lib/data";
+'use client';
+
+import DocumentList from '@/components/documents/document-list';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import DocumentUpload from "@/components/documents/document-upload";
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+} from '@/components/ui/card';
+import DocumentUpload from '@/components/documents/document-upload';
+import { Button } from '@/components/ui/button';
+import { PlusCircle, Loader2 } from 'lucide-react';
+import { useCollection, useUser, useFirestore } from '@/firebase';
+import { collection, query, where, orderBy } from 'firebase/firestore';
 
 export default function PortalPage() {
-  const customerDocuments = documents.filter(
-    (doc) => doc.uploader.role === "Customer"
+  const { user } = useUser();
+  const db = useFirestore();
+
+  const documentsRef = collection(db, 'documents');
+  const q = query(
+    documentsRef,
+    where('uploaderId', '==', user?.uid || ''),
+    orderBy('createdAt', 'desc')
   );
+  const { data: customerDocuments, loading } = useCollection(q);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -43,7 +53,11 @@ export default function PortalPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {customerDocuments.length > 0 ? (
+          {loading ? (
+            <div className="flex justify-center items-center h-48">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : customerDocuments && customerDocuments.length > 0 ? (
             <DocumentList documents={customerDocuments} />
           ) : (
             <div className="text-center py-12 text-muted-foreground">

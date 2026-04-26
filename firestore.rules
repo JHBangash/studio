@@ -1,0 +1,65 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function getUserData(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data;
+    }
+
+    function isRole(role) {
+      return isSignedIn() && getUserData(request.auth.uid).role == role;
+    }
+
+    function isAdmin() {
+      return isRole('Admin');
+    }
+
+    // USERS collection
+    match /users/{userId} {
+      // Anyone can create their own user profile upon signup
+      allow create: if isSignedIn() && isOwner(userId);
+      // Users can view any profile (for names/avatars), admins can view any profile
+      allow get, list: if isSignedIn();
+      // Users can only update their own profile, Admins can update any
+      allow update: if isSignedIn() && (isOwner(userId) || isAdmin());
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+
+    // DOCUMENTS collection
+    match /documents/{documentId} {
+      // Any signed-in user can create (upload) a document
+      allow create: if isSignedIn();
+      
+      // Allow read if user is the uploader, part of the workflow, or an admin/employee
+      allow get: if isSignedIn() && 
+                    (resource.data.uploaderId == request.auth.uid ||
+                     isRole('Admin') || isRole('Employee') ||
+                     exists(/databases/$(database)/documents/documents/$(documentId)/workflow/$(request.auth.uid)));
+
+      // Allow list for admins and employees
+      allow list: if isSignedIn() && (isRole('Admin') || isRole('Employee'));
+
+      // Allow updates (e.g. status changes) for admins, employees, or the uploader
+      allow update: if isSignedIn() && (isRole('Admin') || isRole('Employee') || resource.data.uploaderId == request.auth.uid);
+      
+      // Only admins can delete
+      allow delete: if isAdmin();
+
+      // Subcollections
+      match /{allPaths=**} {
+        allow read, write: if isSignedIn() && (isRole('Admin') || isRole('Employee'));
+      }
+    }
+  }
+}

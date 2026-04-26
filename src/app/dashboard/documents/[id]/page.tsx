@@ -1,26 +1,51 @@
-import { documents, type Document } from "@/lib/data";
-import { notFound } from "next/navigation";
-import Link from "next/link";
+'use client';
+
+import { notFound, useParams } from 'next/navigation';
+import Link from 'next/link';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, MessageSquare, ThumbsUp, ThumbsDown, Archive } from "lucide-react";
-import DocumentStatusBadge from "@/components/documents/document-status-badge";
-import WorkflowStatus from "@/components/documents/workflow-status";
-import AuditTrail from "@/components/documents/audit-trail";
-import { Separator } from "@/components/ui/separator";
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  ArrowLeft,
+  Edit,
+  MessageSquare,
+  ThumbsUp,
+  ThumbsDown,
+  Archive,
+  Loader2,
+} from 'lucide-react';
+import DocumentStatusBadge from '@/components/documents/document-status-badge';
+import WorkflowStatus from '@/components/documents/workflow-status';
+import AuditTrail from '@/components/documents/audit-trail';
+import { useDoc, useCollection } from '@/firebase';
+import { doc, collection } from 'firebase/firestore';
 
-export default function DocumentDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const document = documents.find((doc) => doc.id === params.id);
+export default function DocumentDetailPage() {
+  const params = useParams();
+  const id = params.id as string;
+
+  const docRef = doc(useFirestore(), 'documents', id);
+  const { data: document, loading: docLoading } = useDoc(docRef);
+
+  const workflowRef = collection(useFirestore(), 'documents', id, 'workflow');
+  const { data: workflow, loading: workflowLoading } = useCollection(workflowRef);
+
+  const auditTrailRef = collection(useFirestore(), 'documents', id, 'auditTrail');
+  const { data: auditTrail, loading: auditLoading } = useCollection(auditTrailRef);
+
+  const isLoading = docLoading || workflowLoading || auditLoading;
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   if (!document) {
     notFound();
@@ -36,16 +61,16 @@ export default function DocumentDetailPage({
           </Link>
         </Button>
         <div>
-          <h1 className="text-2xl font-bold font-headline leading-tight">
+          <h1 className="text-xl md:text-2xl font-bold font-headline leading-tight truncate">
             {document.name}
           </h1>
           <div className="text-sm text-muted-foreground flex items-center gap-2">
-            Uploaded by {document.uploader.name}
+            Uploaded by {document.uploaderName}
             <DocumentStatusBadge status={document.status} />
           </div>
         </div>
       </div>
-      
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <Card>
@@ -58,13 +83,13 @@ export default function DocumentDetailPage({
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Approval Actions</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2">
-               <Button>
+              <Button>
                 <ThumbsUp className="mr-2 h-4 w-4" /> Approve
               </Button>
               <Button variant="destructive">
@@ -73,7 +98,7 @@ export default function DocumentDetailPage({
               <Button variant="outline">
                 <MessageSquare className="mr-2 h-4 w-4" /> Add Comment
               </Button>
-               <Button variant="secondary">
+              <Button variant="secondary">
                 <Archive className="mr-2 h-4 w-4" /> Archive
               </Button>
             </CardContent>
@@ -90,10 +115,10 @@ export default function DocumentDetailPage({
               </Button>
             </CardHeader>
             <CardContent className="text-sm space-y-2">
-              {Object.entries(document.metadata).map(([key, value]) => (
+              {document.metadata && Object.entries(document.metadata).map(([key, value]) => (
                 <div key={key} className="flex justify-between">
                   <span className="font-medium text-muted-foreground">{key}</span>
-                  <span className="text-right">{value}</span>
+                  <span className="text-right">{String(value)}</span>
                 </div>
               ))}
             </CardContent>
@@ -104,7 +129,7 @@ export default function DocumentDetailPage({
               <CardTitle>Workflow Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <WorkflowStatus workflow={document.workflow} />
+              <WorkflowStatus workflow={workflow} />
             </CardContent>
           </Card>
 
@@ -113,7 +138,7 @@ export default function DocumentDetailPage({
               <CardTitle>Audit Trail</CardTitle>
             </CardHeader>
             <CardContent>
-              <AuditTrail trail={document.auditTrail} />
+              <AuditTrail trail={auditTrail} />
             </CardContent>
           </Card>
         </div>

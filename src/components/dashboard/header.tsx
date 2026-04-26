@@ -1,3 +1,5 @@
+'use client';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -5,22 +7,38 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { LogOut, Settings, User } from "lucide-react";
-import Link from "next/link";
-import Logo from "../logo";
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { LogOut, Settings, User as UserIcon } from 'lucide-react';
+import Link from 'next/link';
+import Logo from '../logo';
+import { useUser } from '@/firebase';
+import { signOutUser } from '@/firebase/auth/auth';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardHeader() {
+  const { user } = useUser();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOutUser();
+    router.push('/login');
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('');
+  };
+
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
-      <div className="flex items-center gap-2">
-         <div className="md:hidden">
-            <Logo className="w-8 h-8"/>
-         </div>
-        <SidebarTrigger className="md:hidden"/>
+      <div className="flex items-center gap-2 md:hidden">
+        <Logo className="w-8 h-8" />
+        <SidebarTrigger />
       </div>
 
       <div className="flex w-full items-center justify-end gap-4">
@@ -28,32 +46,28 @@ export default function DashboardHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar>
-                <AvatarImage src="https://picsum.photos/seed/10/32/32" data-ai-hint="person" />
-                <AvatarFallback>AU</AvatarFallback>
+                <AvatarImage src={user?.avatar} data-ai-hint="person" />
+                <AvatarFallback>{user ? getInitials(user.name) : 'U'}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Admin User</DropdownMenuLabel>
+            <DropdownMenuLabel>{user?.name || 'User'}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="#">
-                <User className="mr-2" />
+              <Link href="/dashboard/users">
+                <UserIcon className="mr-2" />
                 <span>Profile</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="#">
-                <Settings className="mr-2" />
-                <span>Settings</span>
-              </Link>
+            <DropdownMenuItem>
+              <Settings className="mr-2" />
+              <span>Settings</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href="/">
-                <LogOut className="mr-2" />
-                <span>Logout</span>
-              </Link>
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2" />
+              <span>Logout</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
