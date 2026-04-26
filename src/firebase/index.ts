@@ -20,6 +20,11 @@ import { useUser } from './auth/use-user';
 // to get the initialized Firebase services.
 export function getFirebase() {
   const firebaseConfig = getFirebaseConfig();
+
+  if (!firebaseConfig) {
+    return null;
+  }
+  
   const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const firestore = getFirestore(app);

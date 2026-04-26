@@ -11,10 +11,10 @@ export function getFirebaseConfig() {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   };
 
-  // If the config is not set, throw an error.
-  // This is a critical error, as the app cannot function without Firebase config.
+  // If the config is not set, return null. The app will handle this gracefully.
   if (!firebaseConfig.apiKey) {
-    throw new Error('Firebase config is not set. Please check your .env file or environment variables.');
+    console.warn("Firebase configuration is missing. App will run in a degraded mode.");
+    return null;
   }
 
   return firebaseConfig;
