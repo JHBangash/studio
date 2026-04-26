@@ -8,44 +8,48 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Logo from "@/components/logo";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { appUsers } from "@/lib/data";
 import { Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { type User } from "@/lib/data";
 
-export default function LoginPage() {
+export default function SignupPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<User['role'] | ''>('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!role) {
+      toast({
+        variant: "destructive",
+        title: "Sign up failed",
+        description: "Please select a role.",
+      });
+      return;
+    }
     setIsLoading(true);
 
+    // In a real app, you would send this data to your backend to create a user.
+    // Here we just simulate the process and show a success message.
     setTimeout(() => {
-      const user = appUsers.find((u) => u.email === email && u.password === password);
-
-      if (user) {
-        toast({
-          title: "Login Successful",
-          description: `Welcome back, ${user.name}!`,
-        });
-        if (user.role === "Customer") {
-          router.push("/portal");
-        } else {
-          router.push("/dashboard");
-        }
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: "Invalid email or password. Please try again.",
-        });
-        setIsLoading(false);
-      }
-    }, 1000); // Simulate network delay
+      setIsLoading(false);
+      toast({
+        title: "Account Created (Simulation)",
+        description: "Your account has been created. You can now log in.",
+      });
+      router.push("/login");
+    }, 1500);
   };
 
   return (
@@ -53,17 +57,29 @@ export default function LoginPage() {
       <div className="flex w-full max-w-sm flex-col items-center">
         <Logo className="w-14 h-14 mb-4 text-primary" />
         <h1 className="text-2xl font-bold tracking-tighter text-foreground mb-1 font-headline">
-          Sign in to FlowDocs Nexus
+          Create an Account
         </h1>
         <p className="text-muted-foreground mb-6">
-          Enter your credentials to access your portal.
+          Join FlowDocs Nexus to manage your documents.
         </p>
         <Card className="w-full">
           <CardHeader>
-            <CardTitle>Login</CardTitle>
+            <CardTitle>Sign Up</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleSignup} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input 
+                  id="name" 
+                  type="text" 
+                  placeholder="John Doe" 
+                  required 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input 
@@ -87,35 +103,30 @@ export default function LoginPage() {
                   disabled={isLoading}
                 />
               </div>
+               <div className="space-y-2">
+                <Label htmlFor="role">I am a...</Label>
+                 <Select onValueChange={(value) => setRole(value as User['role'])} value={role} required disabled={isLoading}>
+                    <SelectTrigger id="role">
+                        <SelectValue placeholder="Select a role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="Customer">Customer</SelectItem>
+                        <SelectItem value="Employee">Employee</SelectItem>
+                    </SelectContent>
+                </Select>
+              </div>
               <Button className="w-full" type="submit" disabled={isLoading}>
-                {isLoading ? <Loader2 className="animate-spin" /> : "Sign In"}
+                {isLoading ? <Loader2 className="animate-spin" /> : "Create Account"}
               </Button>
             </form>
           </CardContent>
         </Card>
         
         <p className="mt-4 text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="underline hover:text-primary">
-                Sign up
+            Already have an account?{" "}
+            <Link href="/login" className="underline hover:text-primary">
+                Sign in
             </Link>
-        </p>
-
-        <Separator className="my-6" />
-
-        <Card className="w-full bg-muted/50 border-dashed">
-            <CardHeader>
-                <CardTitle className="text-base">Demo Credentials</CardTitle>
-                <CardDescription className="text-xs">Use these mock accounts to explore the different portals. The app will redirect you to the correct portal upon login.</CardDescription>
-            </CardHeader>
-            <CardContent className="text-sm space-y-2">
-                <p><b>Admin/Employee:</b><br />Email: <code className="bg-card p-1 rounded-sm">admin@nexus.com</code><br />Password: <code className="bg-card p-1 rounded-sm">password123</code></p>
-                 <p><b>Customer:</b><br />Email: <code className="bg-card p-1 rounded-sm">customer@client.com</code><br />Password: <code className="bg-card p-1 rounded-sm">password123</code></p>
-            </CardContent>
-        </Card>
-        
-        <p className="mt-8 text-xs text-muted-foreground">
-          <Link href="/" className="underline hover:text-primary">Back to home</Link>
         </p>
       </div>
     </main>
